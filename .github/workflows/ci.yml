@@ -29,12 +29,20 @@ jobs:
 
       - name: Run Linting
         run: |
-          echo "Running ESLint to check code quality..."
+          echo "🔍 [INFO] Running ESLint to check code quality..."
           make lint
-          echo "Code quality checks passed."
+          echo "✨ [SUCCESS] Code quality checks passed."
 
-      - name: Run Unit Tests
+      - name: Start Application in Background
         run: |
-          echo "Executing Jest unit tests..."
+          echo "🚀 [INFO] Booting up the server for testing..."
+          # The '&' at the end tells Linux to run this process in the background!
+          make run &
+          # Wait 5 seconds to ensure the server is fully started
+          sleep 5 
+
+      - name: Run Integration Tests
+        run: |
+          echo "🧪 [INFO] Executing HTTP integration tests..."
           make test
-          echo "🎉All tests passed! Code is stable."
+          echo "🎉 [SUCCESS] All tests passed! Code is stable."
