@@ -8,7 +8,7 @@ on:
       - completed
 
 env:
-  ECR_REPOSITORY: nodejs-demo-app-cicd-actions
+  ECR_REPOSITORY: nodejs-demoapp-cicd-actions
 
 jobs:
   deploy:

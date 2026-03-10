@@ -29,13 +29,13 @@ jobs:
 
       - name: Run Linting
         run: |
-          echo "🔍 [INFO] Running ESLint to check code quality..."
+          echo "Running ESLint to check code quality..."
           make lint
-          echo "✨ [SUCCESS] Code quality checks passed."
+          echo "Code quality checks passed."
 
       - name: Start Application in Background
         run: |
-          echo "🚀 [INFO] Booting up the server for testing..."
+          echo "Booting up the server for testing..."
           # The '&' at the end tells Linux to run this process in the background!
           make run &
           # Wait 5 seconds to ensure the server is fully started
@@ -43,6 +43,6 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          echo "🧪 [INFO] Executing HTTP integration tests..."
+          echo "Executing HTTP integration tests..."
           make test
-          echo "🎉 [SUCCESS] All tests passed! Code is stable."
+          echo "All tests passed! Code is stable."
