@@ -1,0 +1,51 @@
+name: Continuous Deployment (App Runner)
+
+# Trigger this ONLY after the Docker workflow finishes
+on:
+  workflow_run:
+    workflows: ["Docker Build and Push to ECR"]
+    types:
+      - completed
+
+env:
+  ECR_REPOSITORY: nodejs-demo-app-cicd-actions
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    # Safety Check: Only run if the previous workflow actually succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Deploy to AWS App Runner
+        id: deploy-apprunner
+        uses: awslabs/amazon-app-runner-deploy@main
+        with:
+          service: nodejs-demo-service
+          # Grab the exact commit SHA from the workflow that triggered this one!
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.event.workflow_run.head_sha }}
+          access-role-arn: ${{ secrets.APP_RUNNER_ROLE_ARN }}
+          region: ${{ secrets.AWS_REGION }}
+          cpu: 1
+          memory: 2
+          port: 3000
+          wait-for-service-stability-seconds: 600
+
+      - name: App Runner URL
+        run: |
+          echo "Deployment is live!"
+          echo "Application URL: https://${{ steps.deploy-apprunner.outputs.service-url }}"

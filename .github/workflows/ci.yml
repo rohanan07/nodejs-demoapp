@@ -1,0 +1,38 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          echo "Starting dependency installation..."
+          npm ci
+          echo "All dependencies installed successfully."
+
+      - name: Run Linting
+        run: |
+          echo "Running ESLint to check code quality..."
+          make lint
+          echo "Code quality checks passed."
+
+      - name: Run Unit Tests
+        run: |
+          echo "Executing Jest unit tests..."
+          make test
+          echo "🎉All tests passed! Code is stable."
